@@ -48,7 +48,7 @@ namespace GameLogic
             return m_PlayerOneScores == 0 && m_PlayerTwoScores == 0;
         }
 
-        public void addOnePoint(eShapes i_CurrentShape)
+        public void AddOnePointToOpponent(eShapes i_CurrentShape)
         {
             if (i_CurrentShape == eShapes.X)
             {
