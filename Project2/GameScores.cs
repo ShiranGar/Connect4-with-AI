@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GameLogic
+﻿namespace GameLogic
 {
     public class GameScores
     {
@@ -15,32 +13,14 @@ namespace GameLogic
 
         public int PlayerOneScores
         {
-            get
-            {
-                return m_PlayerOneScores;
-            }
-            set
-            {
-                m_PlayerOneScores = value;
-            }
+            get { return m_PlayerOneScores; }
+            set { m_PlayerOneScores = value; }
         }
 
         public int PlayerTwoScores
         {
-            get
-            {
-                return m_PlayerTwoScores;
-            }
-            set
-            {
-                m_PlayerTwoScores = value;
-            }
-        }
-
-        public string ShowScores()
-        {
-            return String.Format("Player 1 scores: {0}, Player 2 scores: {1}",
-                m_PlayerOneScores, m_PlayerTwoScores);
+            get { return m_PlayerTwoScores; }
+            set { m_PlayerTwoScores = value; }
         }
 
         public bool IsZeroTie()

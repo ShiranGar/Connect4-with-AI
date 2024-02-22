@@ -1,4 +1,4 @@
-﻿namespace UI
+﻿namespace GameUi
 {
     public enum eGameType
     {

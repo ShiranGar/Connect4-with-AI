@@ -39,10 +39,10 @@
     <Compile Include="eGameType.cs" />
     <Compile Include="ePlayer.cs" />
     <Compile Include="eShapes.cs" />
-    <Compile Include="GameLogic.cs" />
+    <Compile Include="BoardGameManager.cs" />
     <Compile Include="GameScores.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="UI.cs" />
+    <Compile Include="ConnectFourUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Ex02.ConsoleUtils">

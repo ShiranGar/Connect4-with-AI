@@ -1,4 +1,4 @@
-﻿using UI;
+﻿using GameUi;
 
 namespace Project2
 {

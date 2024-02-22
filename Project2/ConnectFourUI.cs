@@ -2,11 +2,11 @@
 using System;
 using Ex02.ConsoleUtils;
 
-namespace UI
+namespace GameUi
 {
     public class ConnectFourUI
     {
-        private ConnectFourGame m_Game;
+        private BoardGameManager m_GameBoard;
         readonly int r_MaxColsOrRows = 8;
         readonly int r_MinColsOrRows = 4;
         eGameType m_GameType;
@@ -19,9 +19,9 @@ namespace UI
         public void StartGame()
         {
             printBoard();
-            string userInput = GetUserInput();
+            string userInput = getUserInput();
 
-            while (!m_Game.IsBoardFull())
+            while (!m_GameBoard.IsBoardFull())
             {
                 bool isQuit;
                 int columnIntInput;
@@ -29,33 +29,33 @@ namespace UI
 
                 if (isQuit)
                 {
-                    m_Game.GameScores.AddOnePointToOpponent(m_Game.CurrentPlayer);
+                    m_GameBoard.GameScores.AddOnePointToOpponent(m_GameBoard.CurrentPlayer);
                     break;
                 }
-                if(!m_Game.IsInMatrixRange(columnIntInput))
+                if (!m_GameBoard.IsInMatrixRange(columnIntInput))
                 {
                     Console.WriteLine("Not in matrix range. Please try again");
-                    userInput = GetUserInput();
+                    userInput = getUserInput();
                     continue;
                 }
-                else if (m_Game.IsColFull(columnIntInput - 1))
+                else if (m_GameBoard.IsColFull(columnIntInput - 1))
                 {
                     Console.WriteLine("This column is full, please try again");
-                    userInput = GetUserInput();
+                    userInput = getUserInput();
                     continue;
                 }
 
                 playerMove(columnIntInput);
                 Screen.Clear();
                 printBoard();
-                if (m_Game.IsGameOver(m_Game.CurrentPlayer))
+                if (m_GameBoard.IsGameOver(m_GameBoard.CurrentPlayer))
                 {
                     break;
                 }
 
                 if (m_GameType == eGameType.AgainstComputer)
                 {
-                    if(computerMove())
+                    if (computerMove())
                     {
                         break;
                     }
@@ -63,30 +63,33 @@ namespace UI
 
                 Screen.Clear();
                 printBoard();
-                if (m_Game.IsGameOver(m_Game.CurrentPlayer))
+                if (m_GameBoard.IsGameOver(m_GameBoard.CurrentPlayer))
                 {
                     break;
                 }
                 else
                 {
-                    userInput = GetUserInput();
+                    userInput = getUserInput();
                 }
             }
 
-            if (m_Game.GameScores.IsZeroTie())
+            if (m_GameBoard.GameScores.IsZeroTie())
             {
                 Console.WriteLine("It's a tie");
             }
             else
             {
-                Console.WriteLine(m_Game.GetWinner() + " you're the winner!");
+                Console.WriteLine(m_GameBoard.GetWinner() + " you're the winner!");
             }
 
-            Console.WriteLine(m_Game.GameScores.ShowScores());
-            NewGame();
+            printFinalScores();
+            if(isCountinueSameGame())
+            {
+                newGame();
+            }
         }
 
-        public eGameType GetGameTypeFromUser()
+        private eGameType getGameTypeFromUser()
         {
             Console.WriteLine("Select game type:");
             Console.WriteLine("1. Two Players");
@@ -122,8 +125,8 @@ namespace UI
                 stringInputCols = Console.ReadLine();
             }
 
-            m_Game = new ConnectFourGame(intInputRows, intInputCols);
-            m_GameType = GetGameTypeFromUser();
+            m_GameBoard = new BoardGameManager(intInputRows, intInputCols);
+            m_GameType = getGameTypeFromUser();
         }
 
         private bool isMatrixSizeValid(int i_RowsOrCols)
@@ -134,7 +137,7 @@ namespace UI
 
         private void printBoard()
         {
-            eShapes[,] board = m_Game.Board;
+            eShapes[,] board = m_GameBoard.Board;
             int boardRows = board.GetLength(0);
             int boardColumns = board.GetLength(1);
 
@@ -155,14 +158,14 @@ namespace UI
                 Console.WriteLine("|");
                 Console.Write(new string('=', boardColumns * 4 + 1));
             }
-            
+
             Console.WriteLine();
         }
 
-        public string GetUserInput()
+        private string getUserInput()
         {
-            ePlayer currentPlayer = (m_Game.CurrentPlayer == eShapes.X) ? ePlayer.Player1 : ePlayer.Player2;
-            string colMessage = string.Format("{0} Select a column to drop your piece 1- {1}", currentPlayer, m_Game.Columns);
+            ePlayer currentPlayer = (m_GameBoard.CurrentPlayer == eShapes.X) ? ePlayer.Player1 : ePlayer.Player2;
+            string colMessage = string.Format("{0} Select a column to drop your piece 1- {1}", currentPlayer, m_GameBoard.Columns);
 
             Console.WriteLine(colMessage);
 
@@ -172,14 +175,14 @@ namespace UI
         private bool isNotQuitAndNotValid(string i_ColInput, out int io_ColumnIntInput)
         {
             string userInput = i_ColInput;
-            bool isQuit = IsLeave(userInput);
+            bool isQuit = isLeave(userInput);
 
             io_ColumnIntInput = getInputInt(userInput);
             while (!isQuit && io_ColumnIntInput == -1)
             {
                 Console.WriteLine("Please try again");
-                userInput = GetUserInput();
-                isQuit = IsLeave(userInput);
+                userInput = getUserInput();
+                isQuit = isLeave(userInput);
                 io_ColumnIntInput = getInputInt(userInput);
             }
 
@@ -188,7 +191,7 @@ namespace UI
 
         private int playerMove(int i_ColInput)
         {
-            return m_Game.MakePlayerMove(i_ColInput - 1);
+            return m_GameBoard.MakePlayerMove(i_ColInput - 1);
         }
 
 
@@ -209,23 +212,23 @@ namespace UI
             bool isComputerWin = false;
             int winningRow, winningCol;
 
-            if(m_Game.CheckConnect4(out winningRow, out winningCol))
+            if (m_GameBoard.IsColumnOfFourExist(out winningRow, out winningCol))
             {
-                m_Game.DropPiece(winningRow, winningCol, eShapes.O);
+                m_GameBoard.DropPiece(winningRow, winningCol, eShapes.O);
                 Screen.Clear();
                 printBoard();
-                m_Game.GameScores.PlayerTwoScores++;
+                m_GameBoard.GameScores.PlayerTwoScores++;
                 isComputerWin = true;
             }
             else
             {
-                m_Game.MakeComputerMove();
+                m_GameBoard.MakeComputerMove();
             }
 
             return isComputerWin;
         }
 
-        public bool IsLeave(string i_InputString)
+        private bool isLeave(string i_InputString)
         {
             return i_InputString == "Q";
         }
@@ -246,20 +249,20 @@ namespace UI
             return userInput == "n" ? isCountinue : !isCountinue;
         }
 
-        public void NewGame()
+        private void newGame()
         {
-            m_Game.SetCurrentPlayer();
-            if (isCountinueSameGame())
-            {
-                m_Game.InitBoard();
-            }
-            else
-            {
-                initializeGame();
-            }
-
+            m_GameBoard.SetCurrentPlayer();
+            m_GameBoard.InitBoard();
             Screen.Clear();
             StartGame();
+        }
+
+        private void printFinalScores()
+        {
+            string finalScores = string.Format("Player 1 scores: {0}, Player 2 scores: {1}"
+                                , m_GameBoard.GameScores.PlayerOneScores, m_GameBoard.GameScores.PlayerTwoScores);
+
+            Console.WriteLine(finalScores);
         }
     }
 }

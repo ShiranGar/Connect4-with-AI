@@ -3,21 +3,21 @@ using System;
 
 namespace GameLogic
 {
-    public class ConnectFourGame
+    public class BoardGameManager
     {
         private eShapes[,] m_Board;
-        private int m_RowCount;
-        private int m_ColumnCount;
+        private int m_BoardRowLength;
+        private int m_BoardColumnLength;
         private readonly int r_WinningScore = int.MaxValue;
         private readonly int r_NumOfSameShape = 4;
         private GameScores m_GameScores;
         private eShapes m_CurrentPlayer;
 
-        public ConnectFourGame(int i_Rows, int i_Columns)
+        public BoardGameManager(int i_Rows, int i_Columns)
         {
-            m_RowCount = i_Rows;
-            m_ColumnCount = i_Columns;
-            m_Board = new eShapes[m_RowCount, m_ColumnCount];
+            m_BoardRowLength = i_Rows;
+            m_BoardColumnLength = i_Columns;
+            m_Board = new eShapes[m_BoardRowLength, m_BoardColumnLength];
             m_CurrentPlayer = eShapes.X;
             m_GameScores = new GameScores();
             InitBoard();
@@ -25,38 +25,23 @@ namespace GameLogic
 
         public eShapes CurrentPlayer
         {
-            get
-            {
-                return m_CurrentPlayer;
-            }
+            get { return m_CurrentPlayer; }
         }
 
         public GameScores GameScores
         {
-            get
-            {
-                return m_GameScores;
-            }
-            set
-            {
-                m_GameScores = value;
-            }
+            get { return m_GameScores; }
+            set { m_GameScores = value; }
         }
 
         public int Columns
         {
-            get
-            {
-                return m_ColumnCount;
-            }
+            get { return m_BoardColumnLength; }
         }
 
         public eShapes[,] Board
         {
-            get
-            {
-                return m_Board;
-            }
+            get { return m_Board; }
         }
 
         public int MakePlayerMove(int i_Col)
@@ -71,7 +56,7 @@ namespace GameLogic
 
         public void MakeComputerMove()
         {
-            int depth = calculateDepth(m_ColumnCount);
+            int depth = calculateDepth(m_BoardColumnLength);
             (int col, int notRelevant) = minimax(m_Board, depth, true);
             int row = getNextOpenRow(col);
 
@@ -107,9 +92,9 @@ namespace GameLogic
 
         public void InitBoard()
         {
-            for (int i = 0; i < m_RowCount; i++)
+            for (int i = 0; i < m_BoardRowLength; i++)
             {
-                for (int j = 0; j < m_ColumnCount; j++)
+                for (int j = 0; j < m_BoardColumnLength; j++)
                 {
                     m_Board[i, j] = eShapes.Empty;
                 }
@@ -120,24 +105,19 @@ namespace GameLogic
 
         public bool IsInMatrixRange(int i_Col)
         {
-            return i_Col <= m_ColumnCount && i_Col > 0;
+            return i_Col <= m_BoardColumnLength && i_Col > 0;
         }
 
         public bool IsColFull(int i_Col)
         {
-            return m_Board[m_RowCount - 1, i_Col] != eShapes.Empty;
-        }
-
-        public bool IsValidLocation(int i_Col)
-        {
-            return IsInMatrixRange(i_Col) && IsColFull(i_Col - 1);
+            return m_Board[m_BoardRowLength - 1, i_Col] != eShapes.Empty;
         }
 
         private int getNextOpenRow(int i_Col)
         {
             int openRow = -1;
 
-            for (int r = 0; r < m_RowCount; r++)
+            for (int r = 0; r < m_BoardRowLength; r++)
             {
                 if (m_Board[r, i_Col] == eShapes.Empty)
                 {
@@ -158,9 +138,9 @@ namespace GameLogic
         {
             bool isWin = false;
 
-            for (int r = 0; r < m_RowCount && !isWin; r++)
+            for (int r = 0; r < m_BoardRowLength && !isWin; r++)
             {
-                for (int c = 0; c < m_ColumnCount - 3; c++)
+                for (int c = 0; c < m_BoardColumnLength - 3; c++)
                 {
                     if (m_Board[r, c] == i_Piece &&
                         m_Board[r, c + 1] == i_Piece &&
@@ -173,9 +153,9 @@ namespace GameLogic
                 }
             }
 
-            for (int c = 0; c < m_ColumnCount && !isWin; c++)
+            for (int c = 0; c < m_BoardColumnLength && !isWin; c++)
             {
-                for (int r = 0; r < m_RowCount - 3; r++)
+                for (int r = 0; r < m_BoardRowLength - 3; r++)
                 {
                     if (m_Board[r, c] == i_Piece &&
                         m_Board[r + 1, c] == i_Piece &&
@@ -188,9 +168,9 @@ namespace GameLogic
                 }
             }
  
-            for (int r = 0; r < m_RowCount - 3 && !isWin; r++)
+            for (int r = 0; r < m_BoardRowLength - 3 && !isWin; r++)
             {
-                for (int c = 0; c < m_ColumnCount - 3; c++)
+                for (int c = 0; c < m_BoardColumnLength - 3; c++)
                 {
                     if (m_Board[r, c] == i_Piece &&
                         m_Board[r + 1, c + 1] == i_Piece &&
@@ -203,9 +183,9 @@ namespace GameLogic
                 }
             }
 
-            for (int r = 0; r < m_RowCount - 3 && !isWin; r++)
+            for (int r = 0; r < m_BoardRowLength - 3 && !isWin; r++)
             {
-                for (int c = 3; c < m_ColumnCount; c++)
+                for (int c = 3; c < m_BoardColumnLength; c++)
                 {
                     if (m_Board[r, c] == i_Piece &&
                         m_Board[r + 1, c - 1] == i_Piece &&
@@ -225,9 +205,9 @@ namespace GameLogic
         {
             bool isFull = true;
 
-            for (int c = 0; c < m_ColumnCount; c++)
+            for (int c = 0; c < m_BoardColumnLength; c++)
             {
-                if (m_Board[m_RowCount - 1, c] == eShapes.Empty)
+                if (m_Board[m_BoardRowLength - 1, c] == eShapes.Empty)
                 {
                     isFull = !isFull;
                     break;
@@ -241,7 +221,7 @@ namespace GameLogic
         {
             List<int> validMoves = new List<int>();
 
-            for (int col = 0; col < m_ColumnCount; col++)
+            for (int col = 0; col < m_BoardColumnLength; col++)
             {
                 if (!IsColFull(col))
                 {
@@ -310,9 +290,9 @@ namespace GameLogic
         {
             int score = 0;
 
-            for (int r = 0; r < m_RowCount; r++)
+            for (int r = 0; r < m_BoardRowLength; r++)
             {
-                for (int c = 0; c < m_ColumnCount - 3; c++)
+                for (int c = 0; c < m_BoardColumnLength - 3; c++)
                 {
                     eShapes[] window = { m_Board[r, c], m_Board[r, c + 1], m_Board[r, c + 2], m_Board[r, c + 3] };
 
@@ -320,9 +300,9 @@ namespace GameLogic
                 }
             }
  
-            for (int c = 0; c < m_ColumnCount; c++)
+            for (int c = 0; c < m_BoardColumnLength; c++)
             {
-                for (int r = 0; r < m_RowCount - 3; r++)
+                for (int r = 0; r < m_BoardRowLength - 3; r++)
                 {
                     eShapes[] window = { m_Board[r, c], m_Board[r + 1, c], m_Board[r + 2, c], m_Board[r + 3, c] };
 
@@ -330,9 +310,9 @@ namespace GameLogic
                 }
             }
  
-            for (int r = 0; r < m_RowCount - 3; r++)
+            for (int r = 0; r < m_BoardRowLength - 3; r++)
             {
-                for (int c = 0; c < m_ColumnCount - 3; c++)
+                for (int c = 0; c < m_BoardColumnLength - 3; c++)
                 {
                     eShapes[] window = { m_Board[r, c], m_Board[r + 1, c + 1], m_Board[r + 2, c + 2], m_Board[r + 3, c + 3] };
 
@@ -340,9 +320,9 @@ namespace GameLogic
                 }
             }
  
-            for (int r = 0; r < m_RowCount - 3; r++)
+            for (int r = 0; r < m_BoardRowLength - 3; r++)
             {
-                for (int c = 3; c < m_ColumnCount; c++)
+                for (int c = 3; c < m_BoardColumnLength; c++)
                 {
                     eShapes[] window = { m_Board[r, c], m_Board[r + 1, c - 1], m_Board[r + 2, c - 2], m_Board[r + 3, c - 3] };
 
@@ -396,7 +376,7 @@ namespace GameLogic
         {
             int openRow = -1;
 
-            for (int r = 0; r < m_RowCount; r++)
+            for (int r = 0; r < m_BoardRowLength; r++)
             {
                 if (i_Board[r, i_Col] == eShapes.Empty)
                 {
@@ -425,15 +405,15 @@ namespace GameLogic
                         ePlayer.Player1 : ePlayer.Player2;
         }
 
-        public bool CheckConnect4(out int io_WinningRow, out int io_WinningCol)
+        public bool IsColumnOfFourExist(out int io_WinningRow, out int io_WinningCol)
         {
             io_WinningRow = -1;
             io_WinningCol = -1;
             bool isWinningMoveExist = false;
                                  
-            for (int col = 0; col < m_ColumnCount && !isWinningMoveExist; col++)
+            for (int col = 0; col < m_BoardColumnLength && !isWinningMoveExist; col++)
             {                        
-                for (int row = 0; row < m_RowCount - 3; row++)
+                for (int row = 0; row < m_BoardRowLength - 3; row++)
                 {            
                     if (m_Board[row, col] == eShapes.O &&
                         m_Board[row + 1, col] == eShapes.O &&
